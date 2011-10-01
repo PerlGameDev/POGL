@@ -11,6 +11,7 @@ use Config;
 # Supported windowing interfaces
 our $is_valid_interface =
 {
+  'SDL'		=> 'SDL instead of GLUT',
   'AGL'		=> 'GLUT framework on Mac OS X',
   'FREEGLUT'	=> 'FreeGLUT, preferred over GLUT',
   'GLUT'	=> 'GLUT; often really FreeGLUT on Linux',
@@ -114,7 +115,6 @@ if ($^O eq 'MSWin32' || $IS_W32API)
   $dist_flags->{NO_EXCLUSIONS} = $dist_flags->{EXCLUSIONS} ? 0 : 1;
 }
 
-
 # Look for available libs
 our @libdirs = qw
 {
@@ -141,6 +141,18 @@ our @check_libs = qw
 };
 
 our $found_libs = get_libs(@libdirs,@check_libs);
+
+
+eval { 
+		require Alien::SDL; 
+		};
+
+unless ($@)
+{
+	$found_libs->{SDL} = 'SDL';
+}
+
+
 die "No OpenGL related libs found\n" if (!scalar($found_libs));
 
 if ($verbose)
